@@ -3,7 +3,7 @@ import Card from './shared/Card'
 import Button from './shared/Button'
 import RatingSelect from './RatingSelect'
 
-const FeedbackForm = () => {
+const FeedbackForm = ({ handleAdd }) => {
   const [text, setText] = useState('')
   const [rating, setRating] = useState(10)
   const [btnIsDisabled, setBtnDisabled] = useState(true)
@@ -11,11 +11,14 @@ const FeedbackForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (text.trim() > 10) {
+    if (text.trim().length > 10) {
+      // create new object
       const newFeedback = {
         text,
         rating,
       }
+      handleAdd(newFeedback)
+      setText('')
     }
   }
 
