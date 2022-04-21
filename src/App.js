@@ -8,6 +8,7 @@ import FeedbackForm from './components/FeedbackForm'
 import feedbackData from './data/feedbackData'
 import AboutIconLink from './components/AboutIconLink'
 import AboutPage from './pages/AboutPage'
+import { FeedbackProvider } from './context/FeedbackContext'
 
 const App = () => {
   // use state with data from external file
@@ -26,30 +27,32 @@ const App = () => {
     setFeedback([newFeedback, ...feedback])
   }
   return (
-    <Router>
-      <Header text="FeedbackUI" />
+    <FeedbackProvider>
+      <Router>
+        <Header text="FeedbackUI" />
 
-      <div className="container">
-        <Routes>
-          <Route
-            exact
-            path="/"
-            element={
-              <>
-                <FeedbackForm handleAdd={addFeedback} />
-                <FeedbackStats feedback={feedback} />
-                <FeedbackList
-                  feedback={feedback}
-                  handleDelete={deleteFeedback}
-                />
-              </>
-            }
-          />
-          <Route path="/about" element={<AboutPage />} />
-        </Routes>
-      </div>
-      <AboutIconLink />
-    </Router>
+        <div className="container">
+          <Routes>
+            <Route
+              exact
+              path="/"
+              element={
+                <>
+                  <FeedbackForm handleAdd={addFeedback} />
+                  <FeedbackStats feedback={feedback} />
+                  <FeedbackList
+                    feedback={feedback}
+                    handleDelete={deleteFeedback}
+                  />
+                </>
+              }
+            />
+            <Route path="/about" element={<AboutPage />} />
+          </Routes>
+        </div>
+        <AboutIconLink />
+      </Router>
+    </FeedbackProvider>
   )
 }
 
