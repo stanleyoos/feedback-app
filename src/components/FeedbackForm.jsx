@@ -5,14 +5,27 @@ import RatingSelect from './RatingSelect'
 import FeedbackContext from '../context/FeedbackContext'
 
 const FeedbackForm = () => {
+  // input field has value={text}
   const [text, setText] = useState('')
+  // rating comes from RatingSelect component, rating and setRating are send as select parameter
   const [rating, setRating] = useState(10)
+  // text must be at least 10 characters long => setBtnDisabled(true)
   const [btnIsDisabled, setBtnDisabled] = useState(true)
+  // if not: setMessage('Text must be at least 10 characters') and display it
   const [message, setMessage] = useState('')
 
+  /* feedbackEdit is an object
+  {
+    item: {},
+    edit: false,
+  }
+  */
   const { addFeedback, feedbackEdit, updateFeedback } =
     useContext(FeedbackContext)
 
+  // whenever edit button in FeedbackItem is clicked
+  // feedbackEdit.edit === trueand item is filled with text and rating
+  // FeedbackForm is filled with setText and setRating
   useEffect(() => {
     if (feedbackEdit.edit) {
       setBtnDisabled(false)
@@ -21,25 +34,30 @@ const FeedbackForm = () => {
     }
   }, [feedbackEdit])
 
+  // form is submitted
   const handleSubmit = (e) => {
+    // prevent reloading
     e.preventDefault()
     if (text.trim().length > 10) {
-      // create new object
+      // create new object, take text and rating from state
       const newFeedback = {
         text,
         rating,
       }
+      // if edit button was clicked
       if (feedbackEdit.edit) {
         updateFeedback(feedbackEdit.item.id, newFeedback)
       } else {
+        // add new feedback
         addFeedback(newFeedback)
       }
-
+      // reset input text field
       setText('')
     }
   }
 
   const handleTextInput = (e) => {
+    // button is disabled when there is no text
     if (text === '') {
       setMessage(null)
       setBtnDisabled(true)
@@ -47,9 +65,11 @@ const FeedbackForm = () => {
       setMessage('Text must be at least 10 characters')
       setBtnDisabled(true)
     } else {
+      // if text is at least 10 characters long
       setBtnDisabled(false)
       setMessage(null)
     }
+    // set state with e.target.value
     setText(e.target.value)
   }
   return (

@@ -1,59 +1,83 @@
-import { createContext, useState } from 'react'
-import { v4 as uuidv4 } from 'uuid'
+import { createContext, useState, useEffect } from 'react'
 
 const FeedbackContext = createContext()
 
 export const FeedbackProvider = ({ children }) => {
-  const [feedback, setFeedback] = useState([
-    {
-      id: 1,
-      text: 'This feedback item 1',
-      rating: 10,
-    },
-    {
-      id: 2,
-      text: 'This feedback item 2',
-      rating: 7,
-    },
-    {
-      id: 3,
-      text: 'This feedback item 3',
-      rating: 9,
-    },
-  ])
+  // when data is being fetched isLoading === true
+  // when finished setIsLoading(false)
+  const [isLoading, setIsLoading] = useState(true)
+  // fetch the feedback with useEffect
+  const [feedback, setFeedback] = useState([])
+  // when edit button is clicked useState to update feedbackEdit
   const [feedbackEdit, setFeedbackEdit] = useState({
     item: {},
     edit: false,
   })
 
-  // delete function (filter the feedback state)
+  // fetch data when page is loading at the begining
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  // remember to use async/await syntactic sugar!
+  const fetchData = async () => {
+    // fetch('/feedback') because of "proxy": "http://localhost:5001" in package.json
+    const response = await fetch('/feedback')
+    const data = await response.json()
+    setFeedback(data)
+    setIsLoading(false)
+  }
+
+  // delete function(id) from FeedbackItem
   // first pop up the confirm window
-  const deleteFeedback = (id) => {
+  const deleteFeedback = async (id) => {
     if (window.confirm('Are you sure?')) {
+      // json server is used for 'backend'
+      await fetch(`/feedback/${id}`, { method: 'DELETE' })
+      // filter feedback, if the item's id doesn't match the id
       setFeedback(feedback.filter((item) => item.id !== id))
     }
   }
-  // add new item to array
-  const addFeedback = (newFeedback) => {
-    newFeedback.id = uuidv4()
-    setFeedback([newFeedback, ...feedback])
+  // addFeedback(newFeedback) from FeedbackForm
+  const addFeedback = async (newFeedback) => {
+    // post feedback at backend and add new element to frontend
+    const response = await fetch('/feedback', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newFeedback),
+    })
+    const data = await response.json()
+    setFeedback([data, ...feedback])
   }
-  // set item to be updated
+  // edit button in FeedbackItem
+  // setFeedbackEdit above
   const editFeedback = (item) => {
     setFeedbackEdit({ item, edit: true })
   }
 
-  const updateFeedback = (id, updItem) => {
+  const updateFeedback = async (id, updItem) => {
+    const response = await fetch(`/feedback/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updItem),
+    })
+    const data = await response.json()
     setFeedback(
-      feedback.map((item) => (item.id === id ? { ...item, ...updItem } : item))
+      feedback.map((item) => (item.id === id ? { ...item, ...data } : item))
     )
   }
 
   return (
+    // provide all states and functions to main App component and all children
     <FeedbackContext.Provider
       value={{
         feedback,
         feedbackEdit,
+        isLoading,
         deleteFeedback,
         addFeedback,
         editFeedback,

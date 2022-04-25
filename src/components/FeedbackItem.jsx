@@ -7,6 +7,7 @@ import FeedbackContext from '../context/FeedbackContext'
 const FeedbackItem = ({ item }) => {
   const { deleteFeedback, editFeedback } = useContext(FeedbackContext)
   return (
+    // deleteFeedback and editFeedback come from FeedbackContext
     <Card>
       <div className="num-display">{item.rating}</div>
       <button className="close" onClick={() => deleteFeedback(item.id)}>
@@ -19,7 +20,7 @@ const FeedbackItem = ({ item }) => {
     </Card>
   )
 }
-
+// propTypes checks if item is an object
 FeedbackItem.propTypes = {
   item: PropTypes.object.isRequired,
 }
